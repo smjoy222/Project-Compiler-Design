@@ -50,16 +50,17 @@
      SUB = 266,
      MUL = 267,
      DIV = 268,
-     ASSIGN = 269,
-     SEMICOLON = 270,
-     IF = 271,
-     ELSE = 272,
-     FOR = 273,
-     WHILE = 274,
-     LPAREN = 275,
-     RPAREN = 276,
-     LBRACE = 277,
-     RBRACE = 278
+     SEE = 269,
+     ASSIGN = 270,
+     SEMICOLON = 271,
+     IF = 272,
+     ELSE = 273,
+     FOR = 274,
+     WHILE = 275,
+     LPAREN = 276,
+     RPAREN = 277,
+     LBRACE = 278,
+     RBRACE = 279
    };
 #endif
 
@@ -79,7 +80,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 83 "test.tab.h"
+#line 84 "test.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

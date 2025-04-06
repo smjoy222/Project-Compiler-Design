@@ -20,6 +20,9 @@ floatn  {digit}*"."{digit}+
 "notuba"         { return ELSE; }
 "jonno"          { return FOR; }
 "jokhon"         { return WHILE; }
+"see" { return SEE; }
+
+
 
 {floatn}         { yylval.fval = atof(yytext); return FLOAT_LIT; }
 {integer}        { yylval.ival = atoi(yytext); return INT_LIT; }

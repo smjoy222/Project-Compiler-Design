@@ -53,7 +53,7 @@ void setValue(const char* name, int val) {
 %token <sval> IDENTIFIER
 %token <ival> INT_LIT
 %token <fval> FLOAT_LIT
-%token  INT_KW FLOAT_KW ADD SUB MUL DIV ASSIGN SEMICOLON IF ELSE FOR WHILE LPAREN RPAREN LBRACE RBRACE
+%token  INT_KW FLOAT_KW ADD SUB MUL DIV SEE ASSIGN SEMICOLON IF ELSE FOR WHILE LPAREN RPAREN LBRACE RBRACE 
 
 %type <ival> expression term factor number
 
@@ -74,6 +74,7 @@ statement:
     | if_statement
     | while_statement
     | for_statement
+    | see_statement
 ;
 
 declaration:
@@ -88,6 +89,13 @@ assignment:
         printf("Assigned to: %s with value: %d\n", $1, $3);
     }
 ;
+
+see_statement:
+    SEE IDENTIFIER SEMICOLON {
+        printf("See statement executed: %s = %d\n", $2, getValue($2)); 
+    }
+;
+
 
 if_statement:
     IF LPAREN expression RPAREN LBRACE statements RBRACE {
