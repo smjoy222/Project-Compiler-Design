@@ -51,17 +51,18 @@
      ASSIGN = 267,
      SEMICOLON = 268,
      COMMA = 269,
-     IF = 270,
-     ELSE = 271,
-     FOR = 272,
-     WHILE = 273,
-     SEE = 274,
-     LPAREN = 275,
-     RPAREN = 276,
-     LBRACE = 277,
-     RBRACE = 278,
-     LT = 279,
-     GT = 280
+     JODI = 270,
+     IF = 271,
+     ELSE = 272,
+     FOR = 273,
+     WHILE = 274,
+     SEE = 275,
+     LPAREN = 276,
+     RPAREN = 277,
+     LBRACE = 278,
+     RBRACE = 279,
+     LT = 280,
+     GT = 281
    };
 #endif
 
@@ -72,7 +73,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 89 "test.y"
+#line 80 "test.y"
 
     int ival;
     float fval;
@@ -81,7 +82,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 85 "test.tab.h"
+#line 86 "test.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

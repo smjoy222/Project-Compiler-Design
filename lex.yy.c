@@ -675,7 +675,7 @@ YY_RULE_SETUP
 case 3:
 YY_RULE_SETUP
 #line 19 "test.l"
-{ return IF; }
+{ return JODI; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
@@ -699,97 +699,97 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 27 "test.l"
+#line 28 "test.l"
 { yylval.fval = atof(yytext); return FLOAT_LIT; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 28 "test.l"
+#line 29 "test.l"
 { yylval.ival = atoi(yytext); return INT_LIT; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 30 "test.l"
+#line 31 "test.l"
 { return ADD; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 31 "test.l"
+#line 32 "test.l"
 { return SUB; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 32 "test.l"
+#line 33 "test.l"
 { return MUL; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 33 "test.l"
+#line 34 "test.l"
 { return DIV; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 34 "test.l"
+#line 35 "test.l"
 { return ASSIGN; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 35 "test.l"
+#line 36 "test.l"
 { return SEMICOLON; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 36 "test.l"
+#line 37 "test.l"
 { return LPAREN; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 37 "test.l"
+#line 38 "test.l"
 { return RPAREN; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 38 "test.l"
+#line 39 "test.l"
 { return LBRACE; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 39 "test.l"
+#line 40 "test.l"
 { return RBRACE; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 40 "test.l"
+#line 41 "test.l"
 { return LT; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 41 "test.l"
+#line 42 "test.l"
 { return COMMA; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 42 "test.l"
+#line 43 "test.l"
 { return GT; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 43 "test.l"
+#line 44 "test.l"
 { /* Skip whitespace */ }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 44 "test.l"
+#line 45 "test.l"
 { yylval.sval = strdup(yytext); return IDENTIFIER; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 45 "test.l"
+#line 46 "test.l"
 { printf("Invalid character: %c\n", yytext[0]); }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 46 "test.l"
+#line 47 "test.l"
 ECHO;
 	YY_BREAK
 #line 796 "lex.yy.c"
@@ -1678,4 +1678,4 @@ int main()
 	return 0;
 	}
 #endif
-#line 46 "test.l"
+#line 47 "test.l"

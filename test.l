@@ -16,11 +16,12 @@ floatn  {digit}*"."{digit}+
 %%
 "int"            { return INT_KW; }
 "float"          { return FLOAT_KW; }
-"jodi"           { return IF; }
+"jodi"           { return JODI; }
 "notuba"         { return ELSE; }
 "jonno"          { return FOR; }
 "jokhon"         { return WHILE; }
 "see" { return SEE; }
+
 
 
 
