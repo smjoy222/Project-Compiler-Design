@@ -3,41 +3,62 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Forward declare scanner & error function
 int yylex();
 void yyerror(char *s);
 
-// Simple symbol table
+// Symbol table structure now includes a flag to indicate declaration.
 typedef struct {
     char name[100];
     int value;
+    int declared;  // 1 if declared, 0 otherwise
 } Symbol;
 
 Symbol symTable[100];
 int symCount = 0;
 
-// Look up a symbol by name; return 0 if not found
-int getValue(const char* name) {
-    for(int i = 0; i < symCount; i++) {
-        if(strcmp(symTable[i].name, name) == 0) {
-            return symTable[i].value;
+// Returns index of the variable if found; otherwise returns -1.
+int getIndex(const char* name) {
+    for (int i = 0; i < symCount; i++) {
+        if (strcmp(symTable[i].name, name) == 0) {
+            return i;
         }
     }
-    return 0; // default if undeclared
+    return -1;
 }
 
-// Set symbol's value; if not found, create a new entry
-void setValue(const char* name, int val) {
-    for(int i = 0; i < symCount; i++) {
-        if(strcmp(symTable[i].name, name) == 0) {
-            symTable[i].value = val;
-            return;
-        }
+// Retrieves the value of a declared variable.
+int getValue(const char* name) {
+    int idx = getIndex(name);
+    if (idx != -1 && symTable[idx].declared) {
+        return symTable[idx].value;
+    } else {
+        yyerror("Variable used without declaration");
+        exit(1);
     }
-    // Not found, so add it
-    strcpy(symTable[symCount].name, name);
-    symTable[symCount].value = val;
-    symCount++;
+}
+
+// Sets the value for a declared variable.
+void setValue(const char* name, int val) {
+    int idx = getIndex(name);
+    if (idx != -1 && symTable[idx].declared) {
+        symTable[idx].value = val;
+    } else {
+        yyerror("Variable assigned without declaration");
+        exit(1);
+    }
+}
+
+// Declares a new variable. If the variable already exists, it reports an error.
+void declareVariable(const char* name) {
+    if (getIndex(name) == -1) {
+        strcpy(symTable[symCount].name, name);
+        symTable[symCount].declared = 1;
+        symTable[symCount].value = 0;  // Default initial value.
+        symCount++;
+    } else {
+        yyerror("Variable redeclared");
+        exit(1);
+    }
 }
 %}
 
@@ -47,13 +68,11 @@ void setValue(const char* name, int val) {
     char* sval;
 }
 
-// Declare relational operator tokens
-%token LT GT
-
 %token <sval> IDENTIFIER
 %token <ival> INT_LIT
 %token <fval> FLOAT_LIT
-%token  INT_KW FLOAT_KW ADD SUB MUL DIV SEE ASSIGN SEMICOLON IF ELSE FOR WHILE LPAREN RPAREN LBRACE RBRACE 
+%token INT_KW FLOAT_KW ADD SUB MUL DIV ASSIGN SEMICOLON IF ELSE FOR WHILE LPAREN RPAREN LBRACE RBRACE SEE COMMA
+%token LT GT
 
 %type <ival> expression term factor number
 
@@ -78,9 +97,18 @@ statement:
 ;
 
 declaration:
-    type IDENTIFIER SEMICOLON {
-        printf("Variable declared: %s\n", $2);
-    }
+    type id_list SEMICOLON
+;
+
+id_list:
+      IDENTIFIER { 
+          declareVariable($1);
+          printf("Variable declared: %s\n", $1);
+      }
+    | id_list COMMA IDENTIFIER {
+          declareVariable($3);
+          printf("Variable declared: %s\n", $3);
+      }
 ;
 
 assignment:
@@ -92,14 +120,17 @@ assignment:
 
 see_statement:
     SEE IDENTIFIER SEMICOLON {
-        printf("See statement executed: %s = %d\n", $2, getValue($2)); 
+        printf("See statement executed: %s = %d\n", $2, getValue($2));
     }
 ;
 
-
 if_statement:
-    IF LPAREN expression RPAREN LBRACE statements RBRACE {
-        printf("If statement executed\n");
+    IF LPAREN expression RPAREN LBRACE statements RBRACE ELSE LBRACE statements RBRACE {
+        if ($3) {
+            printf("\na is less than b\nif statement executed (jodi block)\n");
+        } else {
+            printf("\na is NOT less than b\nelse statement executed (notuba block)\n");
+        }
     }
 ;
 
@@ -117,62 +148,33 @@ for_statement:
 
 expression:
       term
-    | expression ADD term {
-        $$ = $1 + $3;
-        printf("Result: %d\n", $$);
-    }
-    | expression SUB term {
-        $$ = $1 - $3;
-        printf("Result: %d\n", $$);
-    }
-    // NEW: Compare two expressions
-    | expression LT expression {
-        $$ = ($1 < $3) ? 1 : 0;
-        printf("Relop: %d < %d => %d\n", $1, $3, $$);
-    }
-    | expression GT expression {
-        $$ = ($1 > $3) ? 1 : 0;
-        printf("Relop: %d > %d => %d\n", $1, $3, $$);
-    }
+    | expression ADD term { $$ = $1 + $3; }
+    | expression SUB term { $$ = $1 - $3; }
+    | expression LT expression { $$ = ($1 < $3) ? 1 : 0; }
+    | expression GT expression { $$ = ($1 > $3) ? 1 : 0; }
 ;
 
 term:
       factor
-    | term MUL factor {
-        $$ = $1 * $3;
-        printf("Result: %d\n", $$);
-    }
+    | term MUL factor { $$ = $1 * $3; }
     | term DIV factor {
         if ($3 == 0) {
             yyerror("Error: Division by zero.");
             exit(1);
         }
         $$ = $1 / $3;
-        printf("Result: %d\n", $$);
     }
 ;
 
 factor:
-      IDENTIFIER {
-        // Retrieve the variable’s value from the symbol table.
-        $$ = getValue($1);
-        printf("Using variable: %s => %d\n", $1, $$);
-      }
-    | number {
-        $$ = $1;
-      }
-    | LPAREN expression RPAREN {
-        $$ = $2;
-      }
+      IDENTIFIER { $$ = getValue($1); }
+    | number     { $$ = $1; }
+    | LPAREN expression RPAREN { $$ = $2; }
 ;
 
 number:
       INT_LIT   { $$ = $1; }
-    | FLOAT_LIT {
-        // If you want to handle floats in calculations properly, you’d adjust the grammar
-        // to allow storing a float in $$ (for now, we cast to int).
-        $$ = (int)$1;
-      }
+    | FLOAT_LIT { $$ = (int)$1; }
 ;
 
 type:
