@@ -1,15 +1,15 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <string.h>  // Needed for strdup
 #include "test.tab.h"
 %}
 
 %option noyywrap
 
 digit   [0-9]+
-letter  [a-zA-Z_]
-id      ({letter}|_)({letter}|{digit}|_)*
+letter  [a-zA-Z_]+
+id      ({letter}|_)({letter}|{digit}|_)* 
 integer {digit}+
 floatn  {digit}*"."{digit}+
 
@@ -20,12 +20,12 @@ floatn  {digit}*"."{digit}+
 "notuba"         { return ELSE; }
 "jonno"          { return FOR; }
 "jokhon"         { return WHILE; }
-"see"            { return SEE; }
+"see" { return SEE; }
+
+
 
 {floatn}         { yylval.fval = atof(yytext); return FLOAT_LIT; }
 {integer}        { yylval.ival = atoi(yytext); return INT_LIT; }
-
-","              { return COMMA; }
 
 "+"              { return ADD; }
 "-"              { return SUB; }
@@ -38,11 +38,9 @@ floatn  {digit}*"."{digit}+
 "{"              { return LBRACE; }
 "}"              { return RBRACE; }
 "<"              { return LT; }
+","              { return COMMA; }
 ">"              { return GT; }
-
 [ \t\n]+         { /* Skip whitespace */ }
-
 {id}             { yylval.sval = strdup(yytext); return IDENTIFIER; }
-
 .                { printf("Invalid character: %c\n", yytext[0]); }
 %%

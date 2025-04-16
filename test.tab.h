@@ -50,16 +50,16 @@
      DIV = 266,
      ASSIGN = 267,
      SEMICOLON = 268,
-     IF = 269,
-     ELSE = 270,
-     FOR = 271,
-     WHILE = 272,
-     LPAREN = 273,
-     RPAREN = 274,
-     LBRACE = 275,
-     RBRACE = 276,
-     SEE = 277,
-     COMMA = 278,
+     COMMA = 269,
+     IF = 270,
+     ELSE = 271,
+     FOR = 272,
+     WHILE = 273,
+     SEE = 274,
+     LPAREN = 275,
+     RPAREN = 276,
+     LBRACE = 277,
+     RBRACE = 278,
      LT = 279,
      GT = 280
    };
@@ -72,7 +72,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 65 "test.y"
+#line 89 "test.y"
 
     int ival;
     float fval;

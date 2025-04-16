@@ -1,3 +1,4 @@
+/* parser.y */
 %{
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,185 +7,228 @@
 int yylex();
 void yyerror(char *s);
 
-// Symbol table structure now includes a flag to indicate declaration.
+/* Define variable types */
+typedef enum { INT_TYPE, FLOAT_TYPE } VarType;
+
+/* Symbol structure: stores name, type, value, and an isSet flag */
 typedef struct {
     char name[100];
-    int value;
-    int declared;  // 1 if declared, 0 otherwise
+    VarType type;
+    union {
+        int iVal;
+        float fVal;
+    } value;
+    int isSet;
 } Symbol;
 
 Symbol symTable[100];
 int symCount = 0;
 
-// Returns index of the variable if found; otherwise returns -1.
-int getIndex(const char* name) {
+/* Look up a symbol by name; returns its index or -1 if not found */
+int findSymbol(const char* name) {
     for (int i = 0; i < symCount; i++) {
-        if (strcmp(symTable[i].name, name) == 0) {
+        if (strcmp(symTable[i].name, name) == 0)
             return i;
-        }
     }
     return -1;
 }
 
-// Retrieves the value of a declared variable.
-int getValue(const char* name) {
-    int idx = getIndex(name);
-    if (idx != -1 && symTable[idx].declared) {
-        return symTable[idx].value;
-    } else {
-        yyerror("Variable used without declaration");
+/* Declare a variable with a given type */
+void declareVar(const char* name, VarType type) {
+    if (findSymbol(name) != -1) {
+        printf("Error: Variable '%s' already declared.\n", name);
         exit(1);
     }
+    strcpy(symTable[symCount].name, name);
+    symTable[symCount].type = type;
+    symTable[symCount].isSet = 0;
+    symCount++;
+    printf("Variable declared: %s\n", name);
 }
 
-// Sets the value for a declared variable.
-void setValue(const char* name, int val) {
-    int idx = getIndex(name);
-    if (idx != -1 && symTable[idx].declared) {
-        symTable[idx].value = val;
-    } else {
-        yyerror("Variable assigned without declaration");
+/* Assignment for int variables: the expression is computed as float and then converted */
+void setIntValue(const char* name, float val) {
+    int idx = findSymbol(name);
+    if (idx == -1 || symTable[idx].type != INT_TYPE) {
+        printf("Error: Variable '%s' undeclared or type mismatch\n", name);
         exit(1);
     }
+    symTable[idx].value.iVal = (int)val;
+    symTable[idx].isSet = 1;
+    printf("Assigned to: %s with value: %d\n", name, (int)val);
 }
 
-// Declares a new variable. If the variable already exists, it reports an error.
-void declareVariable(const char* name) {
-    if (getIndex(name) == -1) {
-        strcpy(symTable[symCount].name, name);
-        symTable[symCount].declared = 1;
-        symTable[symCount].value = 0;  // Default initial value.
-        symCount++;
-    } else {
-        yyerror("Variable redeclared");
+/* Assignment for float variables */
+void setFloatValue(const char* name, float val) {
+    int idx = findSymbol(name);
+    if (idx == -1 || symTable[idx].type != FLOAT_TYPE) {
+        printf("Error: Variable '%s' undeclared or type mismatch\n", name);
         exit(1);
     }
+    symTable[idx].value.fVal = val;
+    symTable[idx].isSet = 1;
+    printf("Assigned to: %s with value: %.2f\n", name, val);
+}
+
+/* Unified getter: returns a float value for a variable regardless of its type.
+   If the variable is int, it is promoted to float. */
+float getUnifiedValue(const char* name) {
+    int idx = findSymbol(name);
+    if (idx == -1 || !symTable[idx].isSet) {
+        printf("Error: Variable '%s' undeclared or not set\n", name);
+        exit(1);
+    }
+    if (symTable[idx].type == FLOAT_TYPE)
+        return symTable[idx].value.fVal;
+    else
+        return (float)symTable[idx].value.iVal;
 }
 %}
 
+/* Define the semantic value union */
 %union {
     int ival;
     float fval;
     char* sval;
 }
 
+/* Token declarations along with associated types */
 %token <sval> IDENTIFIER
 %token <ival> INT_LIT
 %token <fval> FLOAT_LIT
-%token INT_KW FLOAT_KW ADD SUB MUL DIV ASSIGN SEMICOLON IF ELSE FOR WHILE LPAREN RPAREN LBRACE RBRACE SEE COMMA
-%token LT GT
+%token INT_KW FLOAT_KW ADD SUB MUL DIV ASSIGN SEMICOLON COMMA
+%token IF ELSE FOR WHILE SEE LPAREN RPAREN LBRACE RBRACE LT GT
 
-%type <ival> expression term factor number
+/* The nonterminal 'expr' always returns a float value */
+%type <fval> expr
 
 %%
 
+/* Grammar Rules */
+
+/* The top-level program is a list of statements */
 program:
-    statements
-;
+      statements
+    ;
 
+/* Zero or more statements */
 statements:
-      statement
+      /* empty */
     | statements statement
-;
+    ;
 
+/* A statement can be a declaration, assignment, see or control statement */
 statement:
-      declaration
+      int_declaration
+    | float_declaration
     | assignment
+    | see_statement
     | if_statement
     | while_statement
     | for_statement
-    | see_statement
-;
+    ;
 
-declaration:
-    type id_list SEMICOLON
-;
+/* Declaration rules for integer variables */
+int_declaration:
+    INT_KW int_var_list SEMICOLON
+    ;
 
-id_list:
-      IDENTIFIER { 
-          declareVariable($1);
-          printf("Variable declared: %s\n", $1);
-      }
-    | id_list COMMA IDENTIFIER {
-          declareVariable($3);
-          printf("Variable declared: %s\n", $3);
-      }
-;
+/* Declaration rules for float variables */
+float_declaration:
+    FLOAT_KW float_var_list SEMICOLON
+    ;
 
+/* List of identifiers for int declaration */
+int_var_list:
+      IDENTIFIER { declareVar($1, INT_TYPE); }
+    | int_var_list COMMA IDENTIFIER { declareVar($3, INT_TYPE); }
+    ;
+
+/* List of identifiers for float declaration */
+float_var_list:
+      IDENTIFIER { declareVar($1, FLOAT_TYPE); }
+    | float_var_list COMMA IDENTIFIER { declareVar($3, FLOAT_TYPE); }
+    ;
+
+/* Assignment: evaluates an expression and assigns it to a variable.
+   The expression is always computed as a float. */
 assignment:
-    IDENTIFIER ASSIGN expression SEMICOLON {
-        setValue($1, $3);
-        printf("Assigned to: %s with value: %d\n", $1, $3);
+    IDENTIFIER ASSIGN expr SEMICOLON {
+         int idx = findSymbol($1);
+         if (idx == -1) {
+             printf("Error: Variable '%s' undeclared\n", $1);
+             exit(1);
+         }
+         if (symTable[idx].type == INT_TYPE)
+             setIntValue($1, $3);
+         else
+             setFloatValue($1, $3);
     }
-;
+    ;
 
+/* See statement: prints the current value of a variable based on its type */
 see_statement:
     SEE IDENTIFIER SEMICOLON {
-        printf("See statement executed: %s = %d\n", $2, getValue($2));
+         int idx = findSymbol($2);
+         if (idx == -1) {
+             printf("Error: Variable '%s' undeclared\n", $2);
+             exit(1);
+         }
+         if (symTable[idx].type == INT_TYPE)
+             printf("See statement executed: %s = %d\n", $2, symTable[idx].value.iVal);
+         else
+             printf("See statement executed: %s = %.2f\n", $2, symTable[idx].value.fVal);
     }
-;
+    ;
 
+/* If statement: evaluates an expression for the condition and executes the block of statements */
 if_statement:
-    IF LPAREN expression RPAREN LBRACE statements RBRACE ELSE LBRACE statements RBRACE {
-        if ($3) {
-            printf("\na is less than b\nif statement executed (jodi block)\n");
-        } else {
-            printf("\na is NOT less than b\nelse statement executed (notuba block)\n");
-        }
+    IF LPAREN expr RPAREN LBRACE statements RBRACE {
+         if ($3)
+             printf("If statement executed: condition true\n");
+         else
+             printf("If statement executed: condition false\n");
     }
-;
+    ;
 
+/* While statement: executes the block repeatedly while the condition evaluates to true.
+   (For simplicity, this parser only prints a message instead of looping execution.) */
 while_statement:
-    WHILE LPAREN expression RPAREN LBRACE statements RBRACE {
-        printf("While loop executed\n");
+    WHILE LPAREN expr RPAREN LBRACE statements RBRACE {
+         printf("While loop executed (simulation)\n");
     }
-;
+    ;
 
+/* For statement: includes an initialization assignment, condition, and a second assignment.
+   Again, it only prints a message as a simulation. */
 for_statement:
-    FOR LPAREN assignment expression SEMICOLON assignment RPAREN LBRACE statements RBRACE {
-        printf("For loop executed\n");
+    FOR LPAREN assignment expr SEMICOLON assignment RPAREN LBRACE statements RBRACE {
+         printf("For loop executed (simulation)\n");
     }
-;
+    ;
 
-expression:
-      term
-    | expression ADD term { $$ = $1 + $3; }
-    | expression SUB term { $$ = $1 - $3; }
-    | expression LT expression { $$ = ($1 < $3) ? 1 : 0; }
-    | expression GT expression { $$ = ($1 > $3) ? 1 : 0; }
-;
-
-term:
-      factor
-    | term MUL factor { $$ = $1 * $3; }
-    | term DIV factor {
-        if ($3 == 0) {
-            yyerror("Error: Division by zero.");
-            exit(1);
-        }
-        $$ = $1 / $3;
-    }
-;
-
-factor:
-      IDENTIFIER { $$ = getValue($1); }
-    | number     { $$ = $1; }
-    | LPAREN expression RPAREN { $$ = $2; }
-;
-
-number:
-      INT_LIT   { $$ = $1; }
-    | FLOAT_LIT { $$ = (int)$1; }
-;
-
-type:
-      INT_KW
-    | FLOAT_KW
-;
+/* The expression rules support int and float literals, identifiers, and arithmetic.
+   All arithmetic is performed in float. */
+expr:
+      INT_LIT   { $$ = (float)$1; }
+    | FLOAT_LIT { $$ = $1; }
+    | IDENTIFIER { $$ = getUnifiedValue($1); }
+    | expr ADD expr { $$ = $1 + $3; }
+    | expr SUB expr { $$ = $1 - $3; }
+    | expr MUL expr { $$ = $1 * $3; }
+    | expr DIV expr { 
+         if($3 == 0.0) { 
+             yyerror("Division by zero"); 
+             exit(1); 
+         } else { 
+             $$ = $1 / $3; 
+         }
+      }
+    ;
 
 %%
 
-int main() {
+int main(void) {
     printf("Program Start:\n");
     yyparse();
     return 0;
