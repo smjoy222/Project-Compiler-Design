@@ -102,25 +102,25 @@ int findSymbol(const char* name) {
 
 void declareVar(const char* name, VarType type) {
     if (findSymbol(name) != -1) {
-        printf("Error: Variable '%s' already declared.\n", name);
+        printf("Somossa: Variable '%s' already declare kora hoise.\n", name);
         exit(1);
     }
     strcpy(symTable[symCount].name, name);
     symTable[symCount].type = type;
     symTable[symCount].isSet = 0;
     symCount++;
-    printf("Variable declared: %s\n", name);
+    printf("Variable declare kora holo: %s\n", name);
 }
 
 void setIntValue(const char* name, int val) {
     int idx = findSymbol(name);
     if (idx == -1 || symTable[idx].type != INT_TYPE) {
-        printf("Error: Variable '%s' undeclared or type mismatch\n", name);
+        printf("somossa: Variable '%s' undeclared othoba mismatch hochhe \n", name);
         exit(1);
     }
     symTable[idx].value.iVal = val;
     symTable[idx].isSet = 1;
-    printf("Assigned to: %s with value: %d\n", name, val);
+    printf("Rakha holo: %s te maan: %d\n", name, val);
 }
 
 void setFloatValue(const char* name, float val) {
@@ -131,7 +131,7 @@ void setFloatValue(const char* name, float val) {
     }
     symTable[idx].value.fVal = val;
     symTable[idx].isSet = 1;
-    printf("Assigned to: %s with value: %.2f\n", name, val);
+    printf("Rakha holo: %s te maan: %.2f\n", name, val);
 }
 
 float getUnifiedValue(const char* name) {
@@ -1527,7 +1527,7 @@ yyreduce:
     {
         int idx = findSymbol((yyvsp[(1) - (4)].sval));
         if (idx == -1) {
-            printf("Error: Variable '%s' declared kora hoy ni\n", (yyvsp[(1) - (4)].sval));
+            printf("somossa: Variable '%s' declared kora hoy ni\n", (yyvsp[(1) - (4)].sval));
             exit(1);
         }
         if (symTable[idx].type == INT_TYPE)
@@ -1560,11 +1560,11 @@ yyreduce:
 #line 160 "test.y"
     {
         if ((yyvsp[(3) - (11)].fval) != 0.0) {  
-            printf("Jodi-(if) executed (condition true)\n");
+            printf("Jodi-(if) executed (condition shotto)\n");
             (yyval.fval) = 1.0; 
             
         } else {
-            printf("Jodi-(If) skipped (condition false)\n");
+            printf("Jodi-(If) skipped (condition mittha)\n");
             (yyval.fval) = 0.0;  
             
         }

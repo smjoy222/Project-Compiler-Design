@@ -20,7 +20,7 @@ floatn  {digit}*"."{digit}+
 "notuba"         { return ELSE; }
 "jonno"          { return FOR; }
 "jokhon"         { return JOKHON; }
-"dekhau"            { return DEKHAU; }
+"dekhau"          { return DEKHAU; }
 
 
 

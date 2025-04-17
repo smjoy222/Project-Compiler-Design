@@ -49,7 +49,7 @@ void setIntValue(const char* name, int val) {
     }
     symTable[idx].value.iVal = val;
     symTable[idx].isSet = 1;
-    printf("Assigned to: %s with value: %d\n", name, val);
+    printf("Rakha holo: %s te maan: %d\n", name, val);
 }
 
 void setFloatValue(const char* name, float val) {
@@ -60,7 +60,7 @@ void setFloatValue(const char* name, float val) {
     }
     symTable[idx].value.fVal = val;
     symTable[idx].isSet = 1;
-    printf("Assigned to: %s with value: %.2f\n", name, val);
+    printf("Rakha holo: %s te maan: %.2f\n", name, val);
 }
 
 float getUnifiedValue(const char* name) {
@@ -132,7 +132,7 @@ assignment:
     IDENTIFIER ASSIGN expr SEMICOLON {
         int idx = findSymbol($1);
         if (idx == -1) {
-            printf("Error: Variable '%s' declared kora hoy ni\n", $1);
+            printf("somossa: Variable '%s' declared kora hoy ni\n", $1);
             exit(1);
         }
         if (symTable[idx].type == INT_TYPE)
@@ -159,11 +159,11 @@ see_statement:
 if_statement:
     JODI LPAREN expr RPAREN LBRACE statements RBRACE NOTUBA LBRACE statements RBRACE {
         if ($3 != 0.0) {  
-            printf("Jodi-(if) executed (condition true)\n");
+            printf("Jodi-(if) executed (condition shotto)\n");
             $$ = 1.0; 
             
         } else {
-            printf("Jodi-(If) skipped (condition false)\n");
+            printf("Jodi-(If) skipped (condition mittha)\n");
             $$ = 0.0;  
             
         }
