@@ -84,9 +84,10 @@ float getUnifiedValue(const char* name) {
 %token <ival> INT_LIT
 %token <fval> FLOAT_LIT
 %token INT_KW FLOAT_KW ADD SUB MUL DIV ASSIGN SEMICOLON COMMA
-%token JODI IF ELSE FOR WHILE SEE LPAREN RPAREN LBRACE RBRACE LT GT
+%token JODI IF ELSE FOR WHILE SEE LPAREN RPAREN LBRACE RBRACE LT GT JOKHON
 
 %type <fval> expr
+%type <fval> if_statement  // if else decalare korar jonne
 
 %%
 
@@ -144,12 +145,8 @@ assignment:
 see_statement:
     SEE IDENTIFIER SEMICOLON {
         int idx = findSymbol($2);
-        if (idx == -1) {
-            printf("Error: Variable '%s' undeclared\n", $2);
-            exit(1);
-        }
-        if (!symTable[idx].isSet) {
-            printf("Error: Variable '%s' not initialized\n", $2);
+        if (idx == -1 || !symTable[idx].isSet) {
+            printf("Error: Variable '%s' undeclared or not initialized\n", $2);
             exit(1);
         }
         if (symTable[idx].type == INT_TYPE)
@@ -161,16 +158,25 @@ see_statement:
 
 if_statement:
     JODI LPAREN expr RPAREN LBRACE statements RBRACE {
-        if ($3 != 0.0)
+        if ($3 != 0.0) {  // $3 is the result of 'expr' (condition)
             printf("If executed (condition true)\n");
-        else
+            $$ = 1.0;  // Assign 1.0 to indicate true
+            // Execute the statements within the block only if condition is true
+        } else {
             printf("If skipped (condition false)\n");
+            $$ = 0.0;  // Assign 0.0 to indicate false, but no changes to variables
+        }
     }
 ;
 
+
 while_statement:
     WHILE LPAREN expr RPAREN LBRACE statements RBRACE {
-        printf("While executed\n");
+        if ($3 != 0.0) {
+            printf("While loop executed (condition true)\n");
+        } else {
+            printf("While loop not executed (condition false)\n");
+        }
     }
 ;
 

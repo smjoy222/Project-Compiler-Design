@@ -19,7 +19,7 @@ floatn  {digit}*"."{digit}+
 "jodi"           { return JODI; }
 "notuba"         { return ELSE; }
 "jonno"          { return FOR; }
-"jokhon"         { return WHILE; }
+"jokhon"         { return JOKHON; }
 "see" { return SEE; }
 
 

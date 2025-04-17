@@ -62,7 +62,8 @@
      LBRACE = 278,
      RBRACE = 279,
      LT = 280,
-     GT = 281
+     GT = 281,
+     JOKHON = 282
    };
 #endif
 
@@ -82,7 +83,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 86 "test.tab.h"
+#line 87 "test.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

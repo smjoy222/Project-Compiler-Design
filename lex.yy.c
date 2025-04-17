@@ -690,7 +690,7 @@ YY_RULE_SETUP
 case 6:
 YY_RULE_SETUP
 #line 22 "test.l"
-{ return WHILE; }
+{ return JOKHON; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
