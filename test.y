@@ -4,7 +4,7 @@
 #include <string.h>
 
 int yylex();
-void yyerror(char *s);
+void yyerror(const char *s);
 
 typedef enum { INT_TYPE, FLOAT_TYPE } VarType;
 
@@ -41,15 +41,15 @@ void declareVar(const char* name, VarType type) {
     printf("Variable declared: %s\n", name);
 }
 
-void setIntValue(const char* name, float val) {
+void setIntValue(const char* name, int val) {
     int idx = findSymbol(name);
     if (idx == -1 || symTable[idx].type != INT_TYPE) {
         printf("Error: Variable '%s' undeclared or type mismatch\n", name);
         exit(1);
     }
-    symTable[idx].value.iVal = (int)val;
+    symTable[idx].value.iVal = val;
     symTable[idx].isSet = 1;
-    printf("Assigned to: %s with value: %d\n", name, (int)val);
+    printf("Assigned to: %s with value: %d\n", name, val);
 }
 
 void setFloatValue(const char* name, float val) {
@@ -69,10 +69,7 @@ float getUnifiedValue(const char* name) {
         printf("Error: Variable '%s' undeclared or not set\n", name);
         exit(1);
     }
-    if (symTable[idx].type == FLOAT_TYPE)
-        return symTable[idx].value.fVal;
-    else
-        return (float)symTable[idx].value.iVal;
+    return (symTable[idx].type == FLOAT_TYPE) ? symTable[idx].value.fVal : (float)symTable[idx].value.iVal;
 }
 
 %}
@@ -98,7 +95,7 @@ program:
 ;
 
 statements:
-      /* empty */
+      statement
     | statements statement
 ;
 
@@ -132,15 +129,15 @@ float_var_list:
 
 assignment:
     IDENTIFIER ASSIGN expr SEMICOLON {
-         int idx = findSymbol($1);
-         if (idx == -1) {
-             printf("Error: Variable '%s' undeclared\n", $1);
-             exit(1);
-         }
-         if (symTable[idx].type == INT_TYPE)
-             setIntValue($1, $3);
-         else
-             setFloatValue($1, $3);
+        int idx = findSymbol($1);
+        if (idx == -1) {
+            printf("Error: Variable '%s' undeclared\n", $1);
+            exit(1);
+        }
+        if (symTable[idx].type == INT_TYPE)
+            setIntValue($1, (int)$3);
+        else
+            setFloatValue($1, $3);
     }
 ;
 
@@ -151,32 +148,35 @@ see_statement:
             printf("Error: Variable '%s' undeclared\n", $2);
             exit(1);
         }
-
-        // Check the variable type and print accordingly
-        if (symTable[idx].type == INT_TYPE) {
-            printf("See statement executed: %s = %d\n", $2, symTable[idx].value.iVal);
-        } else if (symTable[idx].type == FLOAT_TYPE) {
-            printf("See statement executed: %s = %.2f\n", $2, symTable[idx].value.fVal);
+        if (!symTable[idx].isSet) {
+            printf("Error: Variable '%s' not initialized\n", $2);
+            exit(1);
         }
+        if (symTable[idx].type == INT_TYPE)
+            printf("See: %s = %d\n", $2, symTable[idx].value.iVal);
+        else
+            printf("See: %s = %.2f\n", $2, symTable[idx].value.fVal);
     }
 ;
 
-
 if_statement:
     JODI LPAREN expr RPAREN LBRACE statements RBRACE {
-        printf("If statement executed\n");
+        if ($3 != 0.0)
+            printf("If executed (condition true)\n");
+        else
+            printf("If skipped (condition false)\n");
     }
 ;
 
 while_statement:
     WHILE LPAREN expr RPAREN LBRACE statements RBRACE {
-        printf("While loop executed\n");
+        printf("While executed\n");
     }
 ;
 
 for_statement:
     FOR LPAREN assignment expr SEMICOLON assignment RPAREN LBRACE statements RBRACE {
-        printf("For loop executed\n");
+        printf("For executed\n");
     }
 ;
 
@@ -187,7 +187,12 @@ expr:
     | expr ADD expr { $$ = $1 + $3; }
     | expr SUB expr { $$ = $1 - $3; }
     | expr MUL expr { $$ = $1 * $3; }
-    | expr DIV expr { if($3 == 0.0) { yyerror("Division by zero"); exit(1); } else { $$ = $1 / $3; } }
+    | expr DIV expr {
+        if($3 == 0.0) { yyerror("Division by zero"); exit(1); }
+        $$ = $1 / $3;
+      }
+    | expr GT expr { $$ = ($1 > $3) ? 1.0 : 0.0; }
+    | expr LT expr { $$ = ($1 < $3) ? 1.0 : 0.0; }
 ;
 
 %%
@@ -198,6 +203,6 @@ int main(void) {
     return 0;
 }
 
-void yyerror(char *s) {
+void yyerror(const char *s) {
     fprintf(stderr, "Error: %s\n", s);
 }
