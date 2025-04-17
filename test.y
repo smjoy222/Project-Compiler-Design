@@ -31,20 +31,20 @@ int findSymbol(const char* name) {
 
 void declareVar(const char* name, VarType type) {
     if (findSymbol(name) != -1) {
-        printf("Error: Variable '%s' already declared.\n", name);
+        printf("Somossa: Variable '%s' already declare kora hoise.\n", name);
         exit(1);
     }
     strcpy(symTable[symCount].name, name);
     symTable[symCount].type = type;
     symTable[symCount].isSet = 0;
     symCount++;
-    printf("Variable declared: %s\n", name);
+    printf("Variable declare kora holo: %s\n", name);
 }
 
 void setIntValue(const char* name, int val) {
     int idx = findSymbol(name);
     if (idx == -1 || symTable[idx].type != INT_TYPE) {
-        printf("Error: Variable '%s' undeclared or type mismatch\n", name);
+        printf("somossa: Variable '%s' undeclared othoba mismatch hochhe \n", name);
         exit(1);
     }
     symTable[idx].value.iVal = val;
@@ -66,7 +66,7 @@ void setFloatValue(const char* name, float val) {
 float getUnifiedValue(const char* name) {
     int idx = findSymbol(name);
     if (idx == -1 || !symTable[idx].isSet) {
-        printf("Error: Variable '%s' undeclared or not set\n", name);
+        printf("Somossa: Variable '%s' declared set kora hoy ni\n", name);
         exit(1);
     }
     return (symTable[idx].type == FLOAT_TYPE) ? symTable[idx].value.fVal : (float)symTable[idx].value.iVal;
@@ -84,10 +84,10 @@ float getUnifiedValue(const char* name) {
 %token <ival> INT_LIT
 %token <fval> FLOAT_LIT
 %token INT_KW FLOAT_KW ADD SUB MUL DIV ASSIGN SEMICOLON COMMA
-%token JODI IF ELSE FOR WHILE SEE LPAREN RPAREN LBRACE RBRACE LT GT JOKHON
+%token JODI IF ELSE FOR WHILE SEE LPAREN RPAREN LBRACE RBRACE LT GT JOKHON NOTUBA JONNO DEKHAU
 
 %type <fval> expr
-%type <fval> if_statement  // if else decalare korar jonne
+%type <fval> if_statement  
 
 %%
 
@@ -132,7 +132,7 @@ assignment:
     IDENTIFIER ASSIGN expr SEMICOLON {
         int idx = findSymbol($1);
         if (idx == -1) {
-            printf("Error: Variable '%s' undeclared\n", $1);
+            printf("Error: Variable '%s' declared kora hoy ni\n", $1);
             exit(1);
         }
         if (symTable[idx].type == INT_TYPE)
@@ -143,45 +143,47 @@ assignment:
 ;
 
 see_statement:
-    SEE IDENTIFIER SEMICOLON {
+    DEKHAU IDENTIFIER SEMICOLON {
         int idx = findSymbol($2);
         if (idx == -1 || !symTable[idx].isSet) {
-            printf("Error: Variable '%s' undeclared or not initialized\n", $2);
+            printf("somossa: Variable '%s' declared initialized kora hoy ni\n", $2);
             exit(1);
         }
         if (symTable[idx].type == INT_TYPE)
-            printf("See: %s = %d\n", $2, symTable[idx].value.iVal);
+            printf("Dekhano Hocche: %s = %d\n", $2, symTable[idx].value.iVal);
         else
-            printf("See: %s = %.2f\n", $2, symTable[idx].value.fVal);
+            printf("Dekhano Hocche: %s = %.2f\n", $2, symTable[idx].value.fVal);
     }
 ;
 
 if_statement:
-    JODI LPAREN expr RPAREN LBRACE statements RBRACE {
-        if ($3 != 0.0) {  // $3 is the result of 'expr' (condition)
-            printf("If executed (condition true)\n");
-            $$ = 1.0;  // Assign 1.0 to indicate true
-            // Execute the statements within the block only if condition is true
+    JODI LPAREN expr RPAREN LBRACE statements RBRACE NOTUBA LBRACE statements RBRACE {
+        if ($3 != 0.0) {  
+            printf("Jodi-(if) executed (condition true)\n");
+            $$ = 1.0; 
+            
         } else {
-            printf("If skipped (condition false)\n");
-            $$ = 0.0;  // Assign 0.0 to indicate false, but no changes to variables
+            printf("Jodi-(If) skipped (condition false)\n");
+            $$ = 0.0;  
+            
         }
     }
 ;
+
 
 
 while_statement:
     WHILE LPAREN expr RPAREN LBRACE statements RBRACE {
         if ($3 != 0.0) {
-            printf("While loop executed (condition true)\n");
+            printf("jokhon loop executed (condition true)\n");
         } else {
-            printf("While loop not executed (condition false)\n");
+            printf("jokhon loop not executed (condition false)\n");
         }
     }
 ;
 
 for_statement:
-    FOR LPAREN assignment expr SEMICOLON assignment RPAREN LBRACE statements RBRACE {
+    JONNO LPAREN assignment expr SEMICOLON assignment RPAREN LBRACE statements RBRACE {
         printf("For executed\n");
     }
 ;
@@ -194,7 +196,7 @@ expr:
     | expr SUB expr { $$ = $1 - $3; }
     | expr MUL expr { $$ = $1 * $3; }
     | expr DIV expr {
-        if($3 == 0.0) { yyerror("Division by zero"); exit(1); }
+        if($3 == 0.0) { yyerror("zero diye vagh kora jabe na"); exit(1); }
         $$ = $1 / $3;
       }
     | expr GT expr { $$ = ($1 > $3) ? 1.0 : 0.0; }
@@ -204,7 +206,7 @@ expr:
 %%
 
 int main(void) {
-    printf("Program Start:\n");
+    printf("suru hochhe program:\n");
     yyparse();
     return 0;
 }
