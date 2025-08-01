@@ -6,31 +6,31 @@ This project demonstrates lexical analysis, parsing, symbol table management, an
 
 ## ✨ Features
 
-  ✅ Supports variable declarations for **int** and **float**
-  ✅ Assignment and evaluation of arithmetic expressions  
-  ✅ Print variables using Bangla keyword **`dekhau`**
-  ✅ Conditional statements using Bangla keywords  
-   **`jodi`** → `if`  
-    **`notuba`** → `else`  
-  ✅ Loop constructs  
-   **`jonno`** → `for`  
-   **`jokhon`** → `while`  
-  ✅ Basic symbol table implementation with type checking  
-  ✅ Error handling for undeclared variables, type mismatches, and division by zero  
-
+  ✅ Supports variable declarations for **int** and **float**<br>
+  ✅ Assignment and evaluation of arithmetic expressions<br>
+  ✅ Print variables using Bangla keyword **`dekhau`**<br>
+  ✅ Conditional statements using Bangla keywords  <br>
+   **`jodi`** → `if`  <br>
+    **`notuba`** → `else`  <br>
+  ✅ Loop constructs  <br>
+   **`jonno`** → `for`  <br>
+   **`jokhon`** → `while`  <br>
+  ✅ Basic symbol table implementation with type checking  <br>
+  ✅ Error handling for undeclared variables, type mismatches, and division by zero  <br>
+  
 
 ## 📂 Project Structure
-Project-Compiler-Design/
-│
-├── lexer.l # Lexical analyzer (Flex)
-├── parser.y # Syntax analyzer (Bison)
-├── test.tab.h # Generated Bison header
-├── test.tab.c # Generated Bison parser
-├── lex.yy.c # Generated Flex scanner
-├── a.out # Executable after compilation
-└── README.md # Project documentation
+Project-Compiler-Design<br>
+│<br>
+├── lexer.l   &nbsp;&nbsp;&nbsp;**#Lexical analyzer (Flex)**<br>
+├── parser.y  &nbsp;&nbsp;&nbsp;**#Syntax analyzer (Bison)**<br>
+├── test.tab.h &nbsp;&nbsp;&nbsp; **#Generated Bison header**<br>
+├── test.tab.c &nbsp;&nbsp;&nbsp;**#Generated Bison parser**<br>
+├── lex.yy.c   &nbsp;&nbsp;&nbsp;**#Generated Flex scanner**<br>
+├── a.out      &nbsp;&nbsp;&nbsp;**#Executable after compilation**<br>
+└── README.md  &nbsp;&nbsp;&nbsp;**#Project documentation**<br>
 
-##⚡Bangla Keywords
+## ⚡Bangla Keywords 
 | Bangla Keyword | Equivalent in C |
 | -------------- | --------------- |
 | `jodi`         | `if`            |
@@ -41,66 +41,69 @@ Project-Compiler-Design/
 
 
 ## 🔧 Installation & Usage
-1️⃣ Requirements
-Make sure you have **Flex** and **Bison** installed.
+1️⃣ **Requirements**<br>
+Make sure you have **Flex** and **Bison** installed.<br>
 
-2️⃣ Build the Compiler
-Run the following commands:
-flex lexer.l
-bison -d parser.y
-gcc lex.yy.c test.tab.c -o compiler
+2️⃣ **Build the Compiler**<br>
+Run the following commands:<br>
+flex lexer.l<br>
+bison -d parser.y<br>
+gcc lex.yy.c test.tab.c -o compiler<br>
 
-3️⃣ Run the Compiler
-./compiler < program.txt
-
-
-🌟 Diagram (Flowchart)
-<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/c60befd1-7ca0-4d6e-9515-31d30c21f92d" />
+3️⃣ **Run the Compiler**<br>
+./compiler < program.txt<br>
 
 
-📜 Example Program
-Input (program.txt):
-
-   int x, y;
-   float z;
-
-   x = 5;
-   y = 10;
-   z = 2.5;
-
-   dekhau x;
-   dekhau y;
-   dekhau z;
-
-   jodi (x < y) {
-       dekhau y;
-   } notuba {
-      dekhau x;
-   }
-
-   jonno (x = 0; x < 3; x = x + 1) {
-         dekhau x;
-   }
+## 🌟 Diagram (Flowchart)<br>
+<img width="400" height="500" alt="image" src="https://github.com/user-attachments/assets/c60befd1-7ca0-4d6e-9515-31d30c21f92d" />
 
 
-Output:
-Variable declare kora holo: x
-Variable declare kora holo: y
-Variable declare kora holo: z
-Rakha holo: x te maan: 5
-Rakha holo: y te maan: 10
-Rakha holo: z te maan: 2.50
-Dekhano Hocche: x = 5
-Dekhano Hocche: y = 10
-Dekhano Hocche: z = 2.50
-Jodi-(if) executed (condition shotto)
-Dekhano Hocche: y = 10
-For executed
-Dekhano Hocche: x = 0
-Dekhano Hocche: x = 1
-Dekhano Hocche: x = 2
+## 📜 Example Program
+
+**Input (program.txt):** <br>
+
+   int x, y;<br>
+   float z;<br>
+
+   x = 5;<br>
+   y = 10;<br>
+   z = 2.5;<br>
+
+   dekhau x;<br>
+   dekhau y;<br>
+   dekhau z;<br>
+
+   jodi (x < y) {<br>
+       dekhau y;<br>
+   } notuba {<br>
+      dekhau x;<br>
+   }<br>
+
+   jonno (x = 0; x < 3; x = x + 1) {<br>
+         dekhau x;<br>
+   }<br>
 
 
 
-👨‍💻 Author
-Sazzad Mahmud Joy
+**Output:**<br>
+
+Variable declare kora holo: x<br>
+Variable declare kora holo: y<br>
+Variable declare kora holo: z<br>
+Rakha holo: x te maan: 5<br>
+Rakha holo: y te maan: 10<br>
+Rakha holo: z te maan: 2.50<br>
+Dekhano Hocche: x = 5<br>
+Dekhano Hocche: y = 10<br>
+Dekhano Hocche: z = 2.50<br>
+Jodi-(if) executed (condition shotto)<br>
+Dekhano Hocche: y = 10<br>
+For executed<br>
+Dekhano Hocche: x = 0<br>
+Dekhano Hocche: x = 1<br>
+Dekhano Hocche: x = 2<br>
+<br>
+<br>
+
+## 👨‍💻 Author: [Sazzad Mahmud Joy](https://github.com/smjoy222)
+
